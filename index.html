@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Development Studio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div>
+            <h1>Kingdom Development Studio</h1>
+            <p>Plan, organize, and track a themed kingdom development project</p>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <section class="hero-card">
+            <p>
+                Explore kingdoms, review buildings, track phases, and organize development priorities
+            </p>
+        </section>
+
+        <section class="controls">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search buildings..."
+            >
+
+            <select id="categoryFilter" aria-label="Category filter">
+                <option value="all">All Categories</option>
+                <option value="lodging">Lodging</option>
+                <option value="food">Food & Drink</option>
+                <option value="shop">Shops</option>
+                <option value="activity">Activities</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="infrastructure">Infrastructure</option>
+            </select>
+        </section>
+
+        <section id="buildingGrid" class="building-grid"></section>
+
+        <section id="detailsPanel" class="details-panel">
+            <h2>Building Details</h2>
+            <p>Select a building to view planning details</p>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>
