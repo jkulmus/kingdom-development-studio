@@ -1,3 +1,12 @@
+/**
+ * Kingdom Development Studio
+ * Main JavaScript file
+ *
+ * This file stores sample building data, renders building cards,
+ * displays building details, filters/searches buildings, and updates
+ * the dashboard statistics.
+ */
+
 const buildings = [
     {
         name: "Grand Tavern",
@@ -6,7 +15,7 @@ const buildings = [
         phase: "Phase 1",
         status: "Planning",
         size: "8,000 sq ft",
-        description: "A large medieval-style tavern designed for dining, gathering, and guest entertainment"
+        description: "A large medieval-style tavern designed for dining, gathering, and guest entertainment."
     },
     {
         name: "Blacksmith Forge",
@@ -15,7 +24,7 @@ const buildings = [
         phase: "Phase 1",
         status: "Planning",
         size: "2,500 sq ft",
-        description: "A hands-on forge area for demonstrations, classes, and immersive artisan experiences"
+        description: "A hands-on forge area for demonstrations, classes, and immersive artisan experiences."
     },
     {
         name: "Marketplace",
@@ -24,7 +33,7 @@ const buildings = [
         phase: "Phase 1",
         status: "Planning",
         size: "6,000 sq ft",
-        description: "A collection of themed shops where guests can browse handmade goods and souvenirs"
+        description: "A collection of themed shops where guests can browse handmade goods and souvenirs."
     },
     {
         name: "Arena",
@@ -33,7 +42,7 @@ const buildings = [
         phase: "Phase 1",
         status: "Planning",
         size: "Outdoor",
-        description: "A roped-off performance and event space for shows, contests, and demonstrations"
+        description: "A roped-off performance and event space for shows, contests, and demonstrations."
     },
     {
         name: "Traveler Inn",
@@ -42,7 +51,7 @@ const buildings = [
         phase: "Phase 2",
         status: "Concept",
         size: "12,000 sq ft",
-        description: "Overnight lodging designed for guests who want a longer immersive stay"
+        description: "Overnight lodging designed for guests who want a longer immersive stay."
     },
     {
         name: "Main Gatehouse",
@@ -51,7 +60,43 @@ const buildings = [
         phase: "Phase 1",
         status: "Planning",
         size: "3,500 sq ft",
-        description: "Primary entry point with ticketing, security, and guest welcome functions"
+        description: "Primary entry point with ticketing, security, and guest welcome functions."
+    },
+    {
+        name: "Longhouse Hall",
+        kingdom: "Northern Kingdom",
+        category: "food",
+        phase: "Phase 2",
+        status: "Concept",
+        size: "7,500 sq ft",
+        description: "A large northern-style feast hall for themed dining, gathering, and entertainment."
+    },
+    {
+        name: "Warrior Training Yard",
+        kingdom: "Northern Kingdom",
+        category: "activity",
+        phase: "Phase 2",
+        status: "Concept",
+        size: "Outdoor",
+        description: "An outdoor activity area for demonstrations, training challenges, and guest participation."
+    },
+    {
+        name: "Tea Garden Pavilion",
+        kingdom: "Eastern Kingdom",
+        category: "food",
+        phase: "Phase 3",
+        status: "Concept",
+        size: "4,000 sq ft",
+        description: "A peaceful garden pavilion designed for themed dining, tea service, and quiet gathering."
+    },
+    {
+        name: "Artisan Courtyard",
+        kingdom: "Eastern Kingdom",
+        category: "shop",
+        phase: "Phase 3",
+        status: "Concept",
+        size: "5,000 sq ft",
+        description: "A marketplace-style courtyard for artisan displays, workshops, and guest shopping."
     }
 ];
 
@@ -65,68 +110,13 @@ const buildingCount = document.getElementById("buildingCount");
 const phaseOneCount = document.getElementById("phaseOneCount");
 const planningCount = document.getElementById("planningCount");
 
-function renderBuildings(list) {
-    buildingGrid.innerHTML = "";
+const kingdomButtons = document.querySelectorAll(".kingdom-btn");
 
-    list.forEach((building) => {
-        const card = document.createElement("article");
-        card.className = "building-card";
+let selectedKingdom = "all";
 
-        card.innerHTML = `
-            <h3>${building.name}</h3>
-            <p>${building.description}</p>
-            <span class="badge">${building.kingdom}</span>
-            <span class="badge">${building.phase}</span>
-        `;
-
-        card.addEventListener("click", () => {
-            showBuildingDetails(building);
-        });
-
-        buildingGrid.appendChild(card);
-    });
-}
-
-function showBuildingDetails(building) {
-    detailsPanel.innerHTML = `
-        <h2>${building.name}</h2>
-        <p><strong>Kingdom:</strong> ${building.kingdom}</p>
-        <p><strong>Category:</strong> ${formatCategory(building.category)}</p>
-        <p><strong>Phase:</strong> ${building.phase}</p>
-        <p><strong>Status:</strong> ${building.status}</p>
-        <p><strong>Estimated Size:</strong> ${building.size}</p>
-        <p>${building.description}</p>
-    `;
-}
-
-function formatCategory(category) {
-    const categoryNames = {
-        lodging: "Lodging",
-        food: "Food & Drink",
-        shop: "Shop",
-        activity: "Activity",
-        entertainment: "Entertainment",
-        infrastructure: "Infrastructure"
-    };
-
-    return categoryNames[category] || category;
-}
-
-function filterBuildings() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const selectedCategory = categoryFilter.value;
-
-    const filteredBuildings = buildings.filter((building) => {
-        const matchesSearch = building.name.toLowerCase().includes(searchTerm);
-        const matchesCategory =
-            selectedCategory === "all" || building.category === selectedCategory;
-
-        return matchesSearch && matchesCategory;
-    });
-
-    renderBuildings(filteredBuildings);
-}
-
+/**
+ * Update the top dashboard statistic cards.
+ */
 function updateDashboardStats() {
     const uniqueKingdoms = new Set(buildings.map((building) => building.kingdom));
 
@@ -141,6 +131,113 @@ function updateDashboardStats() {
         return building.status === "Planning";
     }).length;
 }
+
+/**
+ * Render building cards to the dashboard.
+ */
+function renderBuildings(list) {
+    buildingGrid.innerHTML = "";
+
+    list.forEach((building) => {
+        const card = document.createElement("article");
+        card.className = "building-card";
+
+        card.innerHTML = `
+            <h3>${building.name}</h3>
+
+            <p>${building.description}</p>
+
+            <div class="card-badges">
+                <span class="badge">${building.kingdom}</span>
+                <span class="badge">${building.phase}</span>
+                <span class="status ${building.status.toLowerCase()}">
+                    ${building.status}
+                </span>
+            </div>
+        `;
+
+        card.addEventListener("click", () => {
+            showBuildingDetails(building);
+        });
+
+        buildingGrid.appendChild(card);
+    });
+}
+
+/**
+ * Show details for the selected building.
+ */
+function showBuildingDetails(building) {
+    detailsPanel.innerHTML = `
+        <h2>${building.name}</h2>
+
+        <hr>
+
+        <p><strong>🏰 Kingdom</strong><br>${building.kingdom}</p>
+        <p><strong>📂 Category</strong><br>${formatCategory(building.category)}</p>
+        <p><strong>📅 Phase</strong><br>${building.phase}</p>
+        <p><strong>🚧 Status</strong><br>${building.status}</p>
+        <p><strong>📐 Estimated Size</strong><br>${building.size}</p>
+
+        <hr>
+
+        <h3>Description</h3>
+        <p>${building.description}</p>
+    `;
+}
+
+/**
+ * Convert category values into readable display names.
+ */
+function formatCategory(category) {
+    const categoryNames = {
+        lodging: "Lodging",
+        food: "Food & Drink",
+        shop: "Shop",
+        activity: "Activity",
+        entertainment: "Entertainment",
+        infrastructure: "Infrastructure"
+    };
+
+    return categoryNames[category] || category;
+}
+
+/**
+ * Search and filter the building list.
+ */
+function filterBuildings() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedCategory = categoryFilter.value;
+
+    const filteredBuildings = buildings.filter((building) => {
+        const matchesSearch = building.name.toLowerCase().includes(searchTerm);
+
+        const matchesCategory =
+            selectedCategory === "all" || building.category === selectedCategory;
+
+        const matchesKingdom =
+            selectedKingdom === "all" || building.kingdom === selectedKingdom;
+
+        return matchesSearch && matchesCategory && matchesKingdom;
+    });
+
+    renderBuildings(filteredBuildings);
+}
+
+/**
+ * Handle kingdom filter buttons.
+ */
+kingdomButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        kingdomButtons.forEach((btn) => btn.classList.remove("active"));
+
+        button.classList.add("active");
+
+        selectedKingdom = button.dataset.kingdom;
+
+        filterBuildings();
+    });
+});
 
 searchInput.addEventListener("input", filterBuildings);
 categoryFilter.addEventListener("change", filterBuildings);
