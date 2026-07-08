@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Node dependencies (if added later)
+node_modules/
+
+# Environment variables
+.env
+
+# Firebase service account (if using Admin SDK later)
+serviceAccountKey.json
