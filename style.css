@@ -75,3 +75,30 @@ body {
 .details-panel h2 {
     margin-top: 0;
 }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background-color: white;
+    padding: 12px;
+    border-radius: 12px;
+    border-top: 5px solid #8b5e34;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card h3 {
+    margin-top: 0;
+    color: #374151;
+    font-size: 16px;
+}
+
+.stat-card p {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+}

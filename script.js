@@ -60,6 +60,11 @@ const detailsPanel = document.getElementById("detailsPanel");
 const searchInput = document.getElementById("searchInput");
 const categoryFilter = document.getElementById("categoryFilter");
 
+const kingdomCount = document.getElementById("kingdomCount");
+const buildingCount = document.getElementById("buildingCount");
+const phaseOneCount = document.getElementById("phaseOneCount");
+const planningCount = document.getElementById("planningCount");
+
 function renderBuildings(list) {
     buildingGrid.innerHTML = "";
 
@@ -122,7 +127,23 @@ function filterBuildings() {
     renderBuildings(filteredBuildings);
 }
 
+function updateDashboardStats() {
+    const uniqueKingdoms = new Set(buildings.map((building) => building.kingdom));
+
+    kingdomCount.textContent = uniqueKingdoms.size;
+    buildingCount.textContent = buildings.length;
+
+    phaseOneCount.textContent = buildings.filter((building) => {
+        return building.phase === "Phase 1";
+    }).length;
+
+    planningCount.textContent = buildings.filter((building) => {
+        return building.status === "Planning";
+    }).length;
+}
+
 searchInput.addEventListener("input", filterBuildings);
 categoryFilter.addEventListener("change", filterBuildings);
 
+updateDashboardStats();
 renderBuildings(buildings);
