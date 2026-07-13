@@ -168,21 +168,53 @@ function renderBuildings(list) {
  * Show details for the selected building.
  */
 function showBuildingDetails(building) {
+    const statusClass = building.status.toLowerCase();
+
     detailsPanel.innerHTML = `
-        <h2>${building.name}</h2>
+        <div class="details-header">
 
-        <hr>
+            <div>
+                <p class="details-eyebrow">${building.kingdom}</p>
+                <h2>${building.name}</h2>
+            </div>
 
-        <p><strong>🏰 Kingdom</strong><br>${building.kingdom}</p>
-        <p><strong>📂 Category</strong><br>${formatCategory(building.category)}</p>
-        <p><strong>📅 Phase</strong><br>${building.phase}</p>
-        <p><strong>🚧 Status</strong><br>${building.status}</p>
-        <p><strong>📐 Estimated Size</strong><br>${building.size}</p>
+            <span class="status ${statusClass}">
+                ${building.status}
+            </span>
 
-        <hr>
+        </div>
 
-        <h3>Description</h3>
-        <p>${building.description}</p>
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">Category</span>
+                <strong>${formatCategory(building.category)}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Development Phase</span>
+                <strong>${building.phase}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Estimated Size</span>
+                <strong>${building.size}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Current Status</span>
+                <strong>${building.status}</strong>
+            </div>
+
+        </div>
+
+        <div class="details-description">
+
+            <h3>Project Description</h3>
+
+            <p>${building.description}</p>
+
+        </div>
     `;
 }
 
