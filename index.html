@@ -2,87 +2,170 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="A project planning dashboard for organizing themed kingdom development."
+    >
+
     <title>Kingdom Development Studio</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
+<body>
     <header class="app-header">
-        <div>
+        <div class="header-content">
             <h1>Kingdom Development Studio</h1>
+
             <p>
-                Manage kingdom expansion, organize construction phases, and track project development from concept to completion
+                Manage kingdom expansion, organize construction phases,
+                and track project development from concept to completion.
             </p>
         </div>
     </header>
 
     <main class="dashboard">
-
         <section class="hero-card">
             <h2>Project Dashboard</h2>
+
             <p>
-                Explore kingdoms, review buildings, track phases, and organize development priorities.
+                Explore kingdoms, review buildings, track phases,
+                and organize development priorities.
             </p>
         </section>
 
-        <section class="stats-grid">
-            <div class="stat-card">
+        <section class="stats-grid" aria-label="Project statistics">
+            <article class="stat-card">
                 <h3>Kingdoms</h3>
                 <p id="kingdomCount">0</p>
-            </div>
+            </article>
 
-            <div class="stat-card">
+            <article class="stat-card">
                 <h3>Buildings</h3>
                 <p id="buildingCount">0</p>
-            </div>
+            </article>
 
-            <div class="stat-card">
+            <article class="stat-card">
                 <h3>Phase 1 Projects</h3>
                 <p id="phaseOneCount">0</p>
-            </div>
+            </article>
 
-            <div class="stat-card">
+            <article class="stat-card">
                 <h3>Planning Status</h3>
                 <p id="planningCount">0</p>
+            </article>
+
+            <article class="stat-card investment-card">
+                <h3>Estimated Investment</h3>
+                <p id="investmentTotal">$0</p>
+            </article>
+        </section>
+
+        <section
+            class="kingdom-selector"
+            aria-label="Filter buildings by kingdom"
+        >
+            <button
+                type="button"
+                class="kingdom-btn active"
+                data-kingdom="all"
+            >
+                All Kingdoms
+            </button>
+
+            <button
+                type="button"
+                class="kingdom-btn"
+                data-kingdom="Castle Kingdom"
+            >
+                Castle Kingdom
+            </button>
+
+            <button
+                type="button"
+                class="kingdom-btn"
+                data-kingdom="Northern Kingdom"
+            >
+                Northern Kingdom
+            </button>
+
+            <button
+                type="button"
+                class="kingdom-btn"
+                data-kingdom="Eastern Kingdom"
+            >
+                Eastern Kingdom
+            </button>
+        </section>
+
+        <section
+            class="controls"
+            aria-label="Building search and filters"
+        >
+            <div class="control-group search-group">
+                <label for="searchInput">Search</label>
+
+                <input
+                    type="search"
+                    id="searchInput"
+                    placeholder="Search buildings..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="control-group">
+                <label for="categoryFilter">Category</label>
+
+                <select id="categoryFilter">
+                    <option value="all" selected>All Categories</option>
+                    <option value="lodging">Lodging</option>
+                    <option value="food">Food &amp; Drink</option>
+                    <option value="shop">Shops</option>
+                    <option value="activity">Activities</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="infrastructure">Infrastructure</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="sortFilter">Sort By</label>
+
+                <select id="sortFilter">
+                    <option value="name" selected>Name</option>
+                    <option value="cost">Estimated Cost</option>
+                    <option value="priority">Priority</option>
+                    <option value="progress">Progress</option>
+                    <option value="phase">Development Phase</option>
+                </select>
             </div>
         </section>
 
-        <section class="kingdom-selector">
-            <button class="kingdom-btn active" data-kingdom="all">All Kingdoms</button>
-            <button class="kingdom-btn" data-kingdom="Castle Kingdom">Castle Kingdom</button>
-            <button class="kingdom-btn" data-kingdom="Northern Kingdom">Northern Kingdom</button>
-            <button class="kingdom-btn" data-kingdom="Eastern Kingdom">Eastern Kingdom</button>
-        </section>
-
-        <section class="controls">
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="Search buildings..."
-            >
-        
-            <label for="categoryFilter">Category</label>
-            <select id="categoryFilter">
-                <option value="all" selected>All Categories</option>
-                <option value="lodging">Lodging</option>
-                <option value="food">Food & Drink</option>
-                <option value="shop">Shops</option>
-                <option value="activity">Activities</option>
-                <option value="entertainment">Entertainment</option>
-                <option value="infrastructure">Infrastructure</option>
-            </select>
-        </section>
-
-        <section id="buildingGrid" class="building-grid"></section>
+        <section
+            id="buildingGrid"
+            class="building-grid"
+            aria-live="polite"
+        ></section>
 
         <section id="detailsPanel" class="details-panel">
             <h2>Building Details</h2>
-            <p>Select a building to view planning details.</p>
-        </section>
 
+            <p>
+                Select a building to view its planning details,
+                estimated cost, progress, priority, and notes.
+            </p>
+        </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="app-footer">
+        <p>Kingdom Development Studio · Version 1.0 · 2026</p>
+    </footer>
+
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
