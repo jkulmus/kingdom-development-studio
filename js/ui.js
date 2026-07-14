@@ -3,9 +3,6 @@ import {
     formatCurrency
 } from "./utils.js";
 
-/**
- * Render building cards to the project dashboard.
- */
 export function renderBuildings(
     buildings,
     buildingGrid,
@@ -17,14 +14,9 @@ export function renderBuildings(
         buildingGrid.innerHTML = `
             <div class="empty-state">
                 <h3>No buildings found</h3>
-
-                <p>
-                    Try changing the search term, category,
-                    or selected kingdom.
-                </p>
+                <p>Try changing the search term or selected filters.</p>
             </div>
         `;
-
         return;
     }
 
@@ -34,14 +26,8 @@ export function renderBuildings(
         card.className = "building-card";
         card.tabIndex = 0;
 
-        card.setAttribute(
-            "aria-label",
-            `View details for ${building.name}`
-        );
-
         card.innerHTML = `
             <h3>${building.name}</h3>
-
             <p>${building.description}</p>
 
             <div class="card-badges">
@@ -69,9 +55,6 @@ export function renderBuildings(
     });
 }
 
-/**
- * Display a detailed planning record for a selected building.
- */
 export function showBuildingDetails(building, detailsPanel) {
     const statusClass = building.status.toLowerCase();
     const priorityClass = building.priority.toLowerCase();
@@ -111,7 +94,6 @@ export function showBuildingDetails(building, detailsPanel) {
 
             <div class="detail-item">
                 <span class="detail-label">Priority</span>
-
                 <span class="priority ${priorityClass}">
                     ${building.priority}
                 </span>
@@ -129,14 +111,7 @@ export function showBuildingDetails(building, detailsPanel) {
                 <strong>${building.progress}%</strong>
             </div>
 
-            <div
-                class="progress-track"
-                role="progressbar"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-valuenow="${building.progress}"
-                aria-label="${building.name} planning progress"
-            >
+            <div class="progress-track">
                 <div
                     class="progress-fill"
                     style="width: ${building.progress}%"
@@ -154,9 +129,4 @@ export function showBuildingDetails(building, detailsPanel) {
             <p>${building.notes}</p>
         </div>
     `;
-
-    detailsPanel.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
 }

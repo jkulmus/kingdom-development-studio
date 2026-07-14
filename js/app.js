@@ -1,14 +1,16 @@
-import { buildings } from "./data.js";
+/**
+ * Kingdom Development Studio
+ * Main application controller
+ *
+ * Loads building records from Firestore, falls back to local
+ * sample data when needed, controls filters and sorting,
+ * and updates dashboard statistics.
+ */
 
-import {
-    formatCurrency,
-    sortBuildings
-} from "./utils.js";
-
-import {
-    renderBuildings,
-    showBuildingDetails
-} from "./ui.js";
+import { buildings as localBuildings } from "./data.js";
+import { getBuildings } from "./buildingService.js";
+import { formatCurrency, sortBuildings } from "./utils.js";
+import { renderBuildings, showBuildingDetails } from "./ui.js";
 
 // Main interface elements
 const buildingGrid = document.getElementById("buildingGrid");
@@ -27,19 +29,36 @@ const investmentTotal = document.getElementById("investmentTotal");
 // Kingdom selector buttons
 const kingdomButtons = document.querySelectorAll(".kingdom-btn");
 
+// Application state
+let buildings = [];
 let selectedKingdom = "all";
 
 /**
- * Update the dashboard statistic cards.
+ * Display a temporary loading message while Firestore is queried.
+ */
+function showLoadingState() {
+    buildingGrid.innerHTML = `
+        <div class="empty-state">
+            <h3>Loading buildings</h3>
+            <p>Retrieving project records from Firestore...</p>
+        </div>
+    `;
+}
+
+/**
+ * Update all dashboard statistic cards using the loaded data.
  */
 function updateDashboardStats() {
     const uniqueKingdoms = new Set(
         buildings.map((building) => building.kingdom)
     );
 
-    const totalInvestment = buildings.reduce((total, building) => {
-        return total + building.estimatedCost;
-    }, 0);
+    const totalInvestment = buildings.reduce(
+        (total, building) => {
+            return total + Number(building.estimatedCost || 0);
+        },
+        0
+    );
 
     kingdomCount.textContent = uniqueKingdoms.size;
     buildingCount.textContent = buildings.length;
@@ -56,25 +75,29 @@ function updateDashboardStats() {
 }
 
 /**
- * Search, filter, and sort the building records.
+ * Search, filter, and sort the currently loaded records.
  */
 function filterBuildings() {
-    const searchTerm = searchInput.value.trim().toLowerCase();
+    const searchTerm = searchInput.value
+        .trim()
+        .toLowerCase();
+
     const selectedCategory = categoryFilter.value;
 
     const filteredBuildings = buildings.filter((building) => {
         const searchableText = `
-            ${building.name}
-            ${building.description}
-            ${building.kingdom}
-            ${building.category}
-            ${building.phase}
-            ${building.status}
-            ${building.priority}
-            ${building.notes}
+            ${building.name || ""}
+            ${building.description || ""}
+            ${building.kingdom || ""}
+            ${building.category || ""}
+            ${building.phase || ""}
+            ${building.status || ""}
+            ${building.priority || ""}
+            ${building.notes || ""}
         `.toLowerCase();
 
-        const matchesSearch = searchableText.includes(searchTerm);
+        const matchesSearch =
+            searchableText.includes(searchTerm);
 
         const matchesCategory =
             selectedCategory === "all" ||
@@ -84,7 +107,11 @@ function filterBuildings() {
             selectedKingdom === "all" ||
             building.kingdom === selectedKingdom;
 
-        return matchesSearch && matchesCategory && matchesKingdom;
+        return (
+            matchesSearch &&
+            matchesCategory &&
+            matchesKingdom
+        );
     });
 
     const sortedBuildings = sortBuildings(
@@ -102,26 +129,90 @@ function filterBuildings() {
 }
 
 /**
- * Handle kingdom selector buttons.
+ * Configure the kingdom selector buttons.
  */
-kingdomButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        kingdomButtons.forEach((currentButton) => {
-            currentButton.classList.remove("active");
+function initializeKingdomButtons() {
+    kingdomButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            kingdomButtons.forEach((currentButton) => {
+                currentButton.classList.remove("active");
+            });
+
+            button.classList.add("active");
+            selectedKingdom = button.dataset.kingdom;
+
+            filterBuildings();
         });
-
-        button.classList.add("active");
-        selectedKingdom = button.dataset.kingdom;
-
-        filterBuildings();
     });
-});
+}
 
-// Search, category, and sorting events
-searchInput.addEventListener("input", filterBuildings);
-categoryFilter.addEventListener("change", filterBuildings);
-sortFilter.addEventListener("change", filterBuildings);
+/**
+ * Load building records from Firestore.
+ *
+ * Local data is retained as a development fallback so the
+ * application can still run if Firestore is unavailable or
+ * if the collection has not been populated yet.
+ */
+async function loadBuildingData() {
+    showLoadingState();
 
-// Initialize the application
-updateDashboardStats();
-filterBuildings();
+    try {
+        const cloudBuildings = await getBuildings();
+
+        if (cloudBuildings.length > 0) {
+            buildings = cloudBuildings;
+
+            console.log(
+                `Loaded ${buildings.length} buildings from Firestore.`
+            );
+        } else {
+            buildings = localBuildings;
+
+            console.warn(
+                "The Firestore buildings collection is empty. " +
+                "Using local sample data."
+            );
+        }
+    } catch (error) {
+        console.error(
+            "Unable to retrieve buildings from Firestore:",
+            error
+        );
+
+        buildings = localBuildings;
+
+        console.warn(
+            "Using local sample data because Firestore " +
+            "could not be reached."
+        );
+    }
+
+    updateDashboardStats();
+    filterBuildings();
+}
+
+/**
+ * Initialize application controls and retrieve project data.
+ */
+function initializeApplication() {
+    initializeKingdomButtons();
+
+    searchInput.addEventListener(
+        "input",
+        filterBuildings
+    );
+
+    categoryFilter.addEventListener(
+        "change",
+        filterBuildings
+    );
+
+    sortFilter.addEventListener(
+        "change",
+        filterBuildings
+    );
+
+    loadBuildingData();
+}
+
+initializeApplication();
