@@ -1,3 +1,6 @@
+/**
+ * Convert category values into readable labels.
+ */
 export function formatCategory(category) {
     const categoryNames = {
         lodging: "Lodging",
@@ -11,6 +14,9 @@ export function formatCategory(category) {
     return categoryNames[category] || category;
 }
 
+/**
+ * Convert a numeric value into United States currency.
+ */
 export function formatCurrency(amount) {
     return new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -19,6 +25,9 @@ export function formatCurrency(amount) {
     }).format(amount);
 }
 
+/**
+ * Sort building records according to the selected option.
+ */
 export function sortBuildings(buildings, sortValue) {
     const sortedBuildings = [...buildings];
 
@@ -30,30 +39,32 @@ export function sortBuildings(buildings, sortValue) {
 
     switch (sortValue) {
         case "cost":
-            return sortedBuildings.sort(
-                (a, b) => b.estimatedCost - a.estimatedCost
-            );
+            return sortedBuildings.sort((a, b) => {
+                return b.estimatedCost - a.estimatedCost;
+            });
 
         case "priority":
-            return sortedBuildings.sort(
-                (a, b) =>
+            return sortedBuildings.sort((a, b) => {
+                return (
                     priorityValues[b.priority] -
                     priorityValues[a.priority]
-            );
+                );
+            });
 
         case "progress":
-            return sortedBuildings.sort(
-                (a, b) => b.progress - a.progress
-            );
+            return sortedBuildings.sort((a, b) => {
+                return b.progress - a.progress;
+            });
 
         case "phase":
-            return sortedBuildings.sort(
-                (a, b) => a.phase.localeCompare(b.phase)
-            );
+            return sortedBuildings.sort((a, b) => {
+                return a.phase.localeCompare(b.phase);
+            });
 
+        case "name":
         default:
-            return sortedBuildings.sort(
-                (a, b) => a.name.localeCompare(b.name)
-            );
+            return sortedBuildings.sort((a, b) => {
+                return a.name.localeCompare(b.name);
+            });
     }
 }

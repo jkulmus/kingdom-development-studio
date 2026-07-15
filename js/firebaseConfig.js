@@ -1,8 +1,8 @@
 /**
- * Firebase configuration and Firestore initialization.
+ * Firebase configuration and service initialization.
  *
- * This uses Firebase's browser SDK. It does not use
- * Firebase Admin credentials or a service-account file.
+ * This browser application uses Firebase's Web SDK.
+ * It does not use a service-account credential file.
  */
 
 import {
@@ -12,6 +12,10 @@ import {
 import {
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+import {
+    getAuth
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCyUdVZZNs4wIsYnwH97JYH1ObPu2sDVq8",
@@ -25,3 +29,4 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 
 export const db = getFirestore(firebaseApp);
+export const auth = getAuth(firebaseApp);

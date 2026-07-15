@@ -1,8 +1,15 @@
+/**
+ * Interface rendering functions.
+ */
+
 import {
     formatCategory,
     formatCurrency
 } from "./utils.js";
 
+/**
+ * Render building cards on the dashboard.
+ */
 export function renderBuildings(
     buildings,
     buildingGrid,
@@ -14,9 +21,14 @@ export function renderBuildings(
         buildingGrid.innerHTML = `
             <div class="empty-state">
                 <h3>No buildings found</h3>
-                <p>Try changing the search term or selected filters.</p>
+
+                <p>
+                    Try changing the search term, category,
+                    or selected kingdom.
+                </p>
             </div>
         `;
+
         return;
     }
 
@@ -26,8 +38,14 @@ export function renderBuildings(
         card.className = "building-card";
         card.tabIndex = 0;
 
+        card.setAttribute(
+            "aria-label",
+            `View details for ${building.name}`
+        );
+
         card.innerHTML = `
             <h3>${building.name}</h3>
+
             <p>${building.description}</p>
 
             <div class="card-badges">
@@ -55,9 +73,38 @@ export function renderBuildings(
     });
 }
 
-export function showBuildingDetails(building, detailsPanel) {
+/**
+ * Show the full planning record for one building.
+ *
+ * The Edit button is only rendered for an authenticated
+ * administrator.
+ */
+export function showBuildingDetails(
+    building,
+    detailsPanel,
+    options = {}
+) {
+    const {
+        canEdit = false,
+        onEdit = null
+    } = options;
+
     const statusClass = building.status.toLowerCase();
     const priorityClass = building.priority.toLowerCase();
+
+    const editControls = canEdit
+        ? `
+            <div class="details-actions">
+                <button
+                    type="button"
+                    id="editBuildingButton"
+                    class="primary-btn"
+                >
+                    Edit Building
+                </button>
+            </div>
+        `
+        : "";
 
     detailsPanel.innerHTML = `
         <div class="details-header">
@@ -84,7 +131,7 @@ export function showBuildingDetails(building, detailsPanel) {
 
             <div class="detail-item">
                 <span class="detail-label">Estimated Size</span>
-                <strong>${building.size}</strong>
+                <strong>${building.size || "Not entered"}</strong>
             </div>
 
             <div class="detail-item">
@@ -94,6 +141,7 @@ export function showBuildingDetails(building, detailsPanel) {
 
             <div class="detail-item">
                 <span class="detail-label">Priority</span>
+
                 <span class="priority ${priorityClass}">
                     ${building.priority}
                 </span>
@@ -101,7 +149,9 @@ export function showBuildingDetails(building, detailsPanel) {
 
             <div class="detail-item">
                 <span class="detail-label">Target Completion</span>
-                <strong>${building.targetCompletion}</strong>
+                <strong>
+                    ${building.targetCompletion || "Not entered"}
+                </strong>
             </div>
         </div>
 
@@ -111,7 +161,14 @@ export function showBuildingDetails(building, detailsPanel) {
                 <strong>${building.progress}%</strong>
             </div>
 
-            <div class="progress-track">
+            <div
+                class="progress-track"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="${building.progress}"
+                aria-label="${building.name} planning progress"
+            >
                 <div
                     class="progress-fill"
                     style="width: ${building.progress}%"
@@ -126,7 +183,24 @@ export function showBuildingDetails(building, detailsPanel) {
 
         <div class="details-notes">
             <h3>Planning Notes</h3>
-            <p>${building.notes}</p>
+            <p>${building.notes || "No planning notes entered."}</p>
         </div>
+
+        ${editControls}
     `;
+
+    if (canEdit && typeof onEdit === "function") {
+        const editBuildingButton = document.getElementById(
+            "editBuildingButton"
+        );
+
+        editBuildingButton.addEventListener("click", () => {
+            onEdit(building);
+        });
+    }
+
+    detailsPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 }

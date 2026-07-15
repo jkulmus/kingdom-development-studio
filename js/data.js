@@ -1,8 +1,8 @@
 /**
- * Local sample data for Kingdom Development Studio.
+ * Local backup data for Kingdom Development Studio.
  *
- * Later, this file will be replaced by building records
- * loaded from Firebase Firestore.
+ * These records are used only if Firestore cannot be reached
+ * or if the Firestore collection is empty.
  */
 
 export const buildings = [

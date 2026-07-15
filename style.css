@@ -10,6 +10,8 @@
     --border: #e5e7eb;
     --shadow: rgba(31, 41, 55, 0.12);
     --shadow-strong: rgba(31, 41, 55, 0.18);
+    --error: #9b2c2c;
+    --success: #2f6f4e;
 }
 
 * {
@@ -32,6 +34,10 @@ button,
 input,
 select {
     font: inherit;
+}
+
+.hidden {
+    display: none !important;
 }
 
 /* Header */
@@ -70,7 +76,9 @@ select {
 
 .hero-card,
 .details-panel,
-.controls {
+.controls,
+.login-panel,
+.user-panel {
     margin-bottom: 26px;
     padding: 24px;
     background-color: var(--card);
@@ -79,7 +87,8 @@ select {
 }
 
 .hero-card h2,
-.details-panel h2 {
+.details-panel h2,
+.login-panel h2 {
     margin-top: 0;
     font-size: 30px;
 }
@@ -88,6 +97,106 @@ select {
     margin-bottom: 0;
     color: var(--muted);
     line-height: 1.55;
+}
+
+/* Authentication */
+
+.login-panel {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 30px;
+    align-items: center;
+    border-top: 4px solid var(--bronze);
+}
+
+.login-introduction p {
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+.section-eyebrow {
+    margin: 0 0 8px;
+    color: var(--bronze) !important;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.login-form {
+    display: grid;
+    gap: 16px;
+}
+
+.primary-btn,
+.secondary-btn {
+    padding: 12px 18px;
+    border-radius: 9px;
+    font-weight: bold;
+    cursor: pointer;
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
+}
+
+.primary-btn {
+    background-color: var(--bronze);
+    color: white;
+    border: 1px solid var(--bronze);
+}
+
+.primary-btn:hover {
+    background-color: #684527;
+}
+
+.primary-btn:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.secondary-btn {
+    background-color: white;
+    color: var(--dark);
+    border: 1px solid var(--border);
+}
+
+.secondary-btn:hover {
+    border-color: var(--bronze-soft);
+    color: var(--bronze);
+}
+
+.form-message {
+    min-height: 20px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.form-message.error {
+    color: var(--error);
+}
+
+.form-message.success {
+    color: var(--success);
+}
+
+.user-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    border-left: 5px solid var(--success);
+}
+
+.user-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 /* Statistic cards */
@@ -160,7 +269,7 @@ select {
     border-bottom-color: var(--bronze);
 }
 
-/* Search, category, and sorting controls */
+/* Controls */
 
 .controls {
     display: grid;
@@ -182,7 +291,8 @@ select {
 }
 
 .controls input,
-.controls select {
+.controls select,
+.login-form input {
     width: 100%;
     padding: 13px 14px;
     background-color: white;
@@ -193,7 +303,8 @@ select {
 }
 
 .controls input:focus,
-.controls select:focus {
+.controls select:focus,
+.login-form input:focus {
     outline: none;
     border-color: var(--bronze-soft);
     box-shadow: 0 0 0 3px rgba(122, 82, 48, 0.15);
@@ -288,7 +399,7 @@ select {
     background-color: #2f6f4e;
 }
 
-/* Empty search state */
+/* Empty state */
 
 .empty-state {
     grid-column: 1 / -1;
@@ -308,7 +419,7 @@ select {
     color: var(--muted);
 }
 
-/* Building detail panel */
+/* Detail panel */
 
 .details-panel {
     border-top: 4px solid var(--bronze);
@@ -364,7 +475,7 @@ select {
     text-transform: uppercase;
 }
 
-/* Priority badges */
+/* Priority */
 
 .priority {
     display: inline-block;
@@ -389,7 +500,7 @@ select {
     color: #496143;
 }
 
-/* Planning progress */
+/* Progress */
 
 .progress-section {
     margin-bottom: 24px;
@@ -480,6 +591,15 @@ select {
         grid-column: auto;
     }
 
+    .login-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .user-panel {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .app-header {
         padding: 34px 18px;
     }
@@ -506,4 +626,165 @@ select {
     .kingdom-btn {
         text-align: left;
     }
+}
+
+/* ===========================
+   Toolbar
+=========================== */
+
+.toolbar{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.toolbar h2{
+
+    margin:0;
+
+}
+
+.toolbar p{
+
+    margin-top:6px;
+    color:var(--muted);
+
+}
+
+/* ===========================
+   Modal
+=========================== */
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:30px;
+
+    z-index:1000;
+
+}
+
+.modal-card{
+
+    background:white;
+
+    width:100%;
+
+    max-width:900px;
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+
+}
+
+.modal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.modal-close{
+
+    border:none;
+
+    background:none;
+
+    font-size:32px;
+
+    cursor:pointer;
+
+}
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+    margin-bottom:20px;
+
+}
+
+textarea{
+
+    width:100%;
+
+    resize:vertical;
+
+    padding:14px;
+
+    border:1px solid var(--border);
+
+    border-radius:10px;
+
+    font:inherit;
+
+}
+
+.modal-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:15px;
+
+    margin-top:25px;
+
+}
+
+@media(max-width:800px){
+
+.form-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.toolbar{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:15px;
+
+}
+
+}
+
+/* Building detail admin actions */
+.details-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
 }
