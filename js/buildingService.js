@@ -8,6 +8,7 @@
 import {
     addDoc,
     collection,
+    deleteDoc,
     doc,
     getDocs,
     updateDoc
@@ -49,9 +50,6 @@ export async function addBuilding(buildingData) {
 
 /**
  * Update an existing building document.
- *
- * @param {string} buildingId Firestore document ID.
- * @param {object} buildingData Updated building information.
  */
 export async function updateBuilding(
     buildingId,
@@ -69,4 +67,17 @@ export async function updateBuilding(
     );
 
     return buildingId;
+}
+
+/**
+ * Delete an existing building document.
+ */
+export async function deleteBuilding(buildingId) {
+    const documentReference = doc(
+        db,
+        BUILDINGS_COLLECTION,
+        buildingId
+    );
+
+    await deleteDoc(documentReference);
 }

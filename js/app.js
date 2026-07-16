@@ -3,8 +3,8 @@
  * Main application controller
  *
  * Loads Firestore records, manages authentication,
- * controls searching and filtering, creates and edits
- * buildings, and updates the project dashboard.
+ * controls searching and filtering, creates, edits,
+ * and deletes buildings, and updates the dashboard.
  */
 
 import {
@@ -13,25 +13,22 @@ import {
 
 import {
     addBuilding,
+    deleteBuilding,
     getBuildings,
     updateBuilding
 } from "./buildingService.js";
 
 import {
-    login,
-    logout,
-    observeAuthState
-} from "./authService.js";
+    initializeAuthentication
+} from "./controllers/authController.js";
 
 import {
     formatCurrency,
     sortBuildings
 } from "./utils.js";
 
-import {
-    renderBuildings,
-    showBuildingDetails
-} from "./ui.js";
+import { renderBuildings } from "./ui/buildingList.js";
+import { showBuildingDetails } from "./ui/buildingDetails.js";
 
 // Main interface elements
 const buildingGrid = document.getElementById("buildingGrid");
@@ -129,6 +126,20 @@ let currentEditingBuildingId = null;
 let currentSelectedBuildingId = null;
 
 /**
+ * Restore the default details-panel message.
+ */
+function resetDetailsPanel() {
+    detailsPanel.innerHTML = `
+        <h2>Building Details</h2>
+
+        <p>
+            Select a building to view its planning details,
+            estimated cost, progress, priority, and notes.
+        </p>
+    `;
+}
+
+/**
  * Show a loading message while Firestore is queried.
  */
 function showLoadingState() {
@@ -171,8 +182,7 @@ function updateDashboardStats() {
 }
 
 /**
- * Display one building and, when signed in,
- * provide its Edit Building button.
+ * Display one building and administrator actions.
  */
 function displayBuildingDetails(building) {
     currentSelectedBuildingId = building.id;
@@ -181,14 +191,15 @@ function displayBuildingDetails(building) {
         building,
         detailsPanel,
         {
-            canEdit: Boolean(currentUser),
-            onEdit: openEditBuildingModal
+            canManage: Boolean(currentUser),
+            onEdit: openEditBuildingModal,
+            onDelete: confirmAndDeleteBuilding
         }
     );
 }
 
 /**
- * Refresh the currently displayed building details.
+ * Refresh the currently selected building details.
  */
 function refreshSelectedBuildingDetails() {
     if (!currentSelectedBuildingId) {
@@ -201,11 +212,14 @@ function refreshSelectedBuildingDetails() {
 
     if (selectedBuilding) {
         displayBuildingDetails(selectedBuilding);
+    } else {
+        currentSelectedBuildingId = null;
+        resetDetailsPanel();
     }
 }
 
 /**
- * Search, filter, and sort the loaded records.
+ * Search, filter, and sort building records.
  */
 function filterBuildings() {
     const searchTerm = searchInput.value
@@ -275,111 +289,7 @@ function initializeKingdomButtons() {
 }
 
 /**
- * Convert Firebase login error codes into readable messages.
- */
-function getLoginErrorMessage(errorCode) {
-    switch (errorCode) {
-        case "auth/invalid-credential":
-        case "auth/wrong-password":
-        case "auth/user-not-found":
-            return "The email address or password is incorrect.";
-
-        case "auth/invalid-email":
-            return "Enter a valid email address.";
-
-        case "auth/user-disabled":
-            return "This administrator account has been disabled.";
-
-        case "auth/too-many-requests":
-            return (
-                "Too many unsuccessful attempts. " +
-                "Please wait before trying again."
-            );
-
-        case "auth/network-request-failed":
-            return (
-                "The sign-in request could not reach Firebase. " +
-                "Check your internet connection."
-            );
-
-        default:
-            return "Unable to sign in. Please try again.";
-    }
-}
-
-/**
- * Configure administrator login and logout.
- */
-function initializeAuthentication() {
-    loginForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        loginMessage.textContent = "";
-        loginMessage.className = "form-message";
-
-        loginButton.disabled = true;
-        loginButton.textContent = "Signing In...";
-
-        try {
-            await login(
-                loginEmail.value.trim(),
-                loginPassword.value
-            );
-
-            loginForm.reset();
-        } catch (error) {
-            console.error("Administrator sign-in failed:", error);
-
-            loginMessage.textContent =
-                getLoginErrorMessage(error.code);
-
-            loginMessage.className =
-                "form-message error";
-        } finally {
-            loginButton.disabled = false;
-            loginButton.textContent = "Sign In";
-        }
-    });
-
-    logoutButton.addEventListener("click", async () => {
-        logoutButton.disabled = true;
-        logoutButton.textContent = "Signing Out...";
-
-        try {
-            await logout();
-        } catch (error) {
-            console.error("Administrator sign-out failed:", error);
-        } finally {
-            logoutButton.disabled = false;
-            logoutButton.textContent = "Sign Out";
-        }
-    });
-
-    observeAuthState((user) => {
-        currentUser = user;
-
-        if (user) {
-            loginPanel.classList.add("hidden");
-            userPanel.classList.remove("hidden");
-            addBuildingButton.classList.remove("hidden");
-
-            userEmail.textContent =
-                user.email || "Administrator";
-        } else {
-            loginPanel.classList.remove("hidden");
-            userPanel.classList.add("hidden");
-            addBuildingButton.classList.add("hidden");
-
-            userEmail.textContent = "";
-            closeBuildingModal();
-        }
-
-        refreshSelectedBuildingDetails();
-    });
-}
-
-/**
- * Restore the Add Building form to its default values.
+ * Reset the modal form.
  */
 function resetBuildingForm() {
     buildingForm.reset();
@@ -399,13 +309,11 @@ function resetBuildingForm() {
 }
 
 /**
- * Display the modal.
+ * Display the building modal.
  */
 function showBuildingModal() {
     buildingModal.classList.remove("hidden");
     buildingModal.setAttribute("aria-hidden", "false");
-
-    document.body.style.overflow = "";
 
     document.body.style.overflow = "hidden";
 
@@ -415,7 +323,7 @@ function showBuildingModal() {
 }
 
 /**
- * Open a blank form for creating a building.
+ * Open a blank Add Building form.
  */
 function openAddBuildingModal() {
     if (!currentUser) {
@@ -471,13 +379,14 @@ function openEditBuildingModal(building) {
     buildingDescription.value =
         building.description || "";
 
-    buildingNotes.value = building.notes || "";
+    buildingNotes.value =
+        building.notes || "";
 
     showBuildingModal();
 }
 
 /**
- * Close and reset the building modal.
+ * Close and reset the modal.
  */
 function closeBuildingModal() {
     buildingModal.classList.add("hidden");
@@ -511,7 +420,7 @@ function createBuildingRecord() {
 }
 
 /**
- * Validate the most important building fields.
+ * Validate important building values.
  */
 function validateBuildingRecord(building) {
     if (!building.name) {
@@ -558,6 +467,51 @@ function validateBuildingRecord(building) {
     }
 
     return true;
+}
+
+/**
+ * Ask for confirmation and delete one Firestore building.
+ */
+async function confirmAndDeleteBuilding(building) {
+    if (!currentUser || !building.id) {
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Delete "${building.name}"?\n\n` +
+        "This action cannot be undone."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        await deleteBuilding(building.id);
+
+        console.log(
+            `Deleted Firestore building: ${building.id}`
+        );
+
+        currentSelectedBuildingId = null;
+        resetDetailsPanel();
+
+        await loadBuildingData();
+
+        window.alert(
+            `${building.name} was deleted successfully.`
+        );
+    } catch (error) {
+        console.error(
+            "Unable to delete the building:",
+            error
+        );
+
+        window.alert(
+            "The building could not be deleted. " +
+            "Please check the console and try again."
+        );
+    }
 }
 
 /**
@@ -722,7 +676,27 @@ async function loadBuildingData() {
  * Initialize the complete application.
  */
 function initializeApplication() {
-    initializeAuthentication();
+    initializeAuthentication({
+        loginPanel,
+        loginForm,
+        loginEmail,
+        loginPassword,
+        loginButton,
+        loginMessage,
+        userPanel,
+        userEmail,
+        logoutButton,
+        addBuildingButton,
+        onAuthStateChanged(user) {
+            currentUser = user;
+
+            if (!user) {
+                closeBuildingModal();
+            }
+
+            refreshSelectedBuildingDetails();
+        }
+    });
     initializeKingdomButtons();
     initializeBuildingModal();
 
